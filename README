@@ -1,0 +1,86 @@
+NAME
+    Time::Local::2074 - Extends 2038 barrier to 2074.
+
+SYNOPSIS
+      use Time::Local::2074 qw(:ALL);
+
+      my @localtime = localtime(2**31);
+      my $seconds   = timelocal(0,0,0,1,10,170);
+      my $ux_time   = UNIX_TIMESTAMP('2073-07-04 12:34:56');
+      my $date      = FROM_UNIXTIME(2**31);
+
+      my $sql = qq(
+             SELECT start_time
+             FROM   projects
+             WHERE  project_id = '1'
+      );
+      my $date_time = $dbh->selectrow_array($sql); # '2073-07-04 12:34:56'
+      my $ux_time   = UNIX_TIMESTAMP($date_time);  # 3266411696
+
+      my $date_time = FROM_UNIXTIME(2**31);
+      my $sql  = qq(
+             UPDATE projects
+             SET    start_time = '$date_time'
+             WHERE  project_id = '1'
+      );
+
+DESCRIPTION
+    This module extends the 2038 boundary to 2074 by taking advantage of the
+    fact that in mid-century, there are always the same number of days in a
+    36-year period, which will have exactly 9 leap years.
+
+PUBLIC METHODS
+    * timelocal
+        Extends Time::Local::timelocal barrier from Jan 1, 2038 to Jan 1,
+        2074.
+
+    * localtime
+        Extends CORE::localtime barrier from Jan 18, 2038 to Jan 18, 2074.
+
+    * timegm
+        Extends Time::Local::timegm barrier from Jan 1, 2038 to Jan 1, 2074.
+
+    * gmtime
+        Extends Time::Local::gmtime barrier from Jan 18, 2038 to Jan 18,
+        2074.
+
+    * UNIX_TIMESTAMP
+        Extends MySQL UNIX_TIMESTAMP() barrier from Jan 18, 2038 to Jan 18,
+        2074.
+
+    * FROM_UNIXTIME
+        Extends MySQL FROM_UNIXTIME() barrier from Jan 18, 2038 to Jan 18,
+        2074.
+
+BUGS
+    Subject to various limitations of localtime, gmtime, and Time::Local
+    functions regarding time zones that are not always in sync with GMT or
+    US daylight saving time.
+
+TODO
+      1) Trap Time::Local::timelocal die in an eval {}.
+      2) Add support for timelocal_nocheck and timegm_nocheck.
+      3) Add better testing for values this module can't handle, like 2074 
+         and beyond.  Make sure the boundary conditions are right.
+      4) Add tests for time zones other than Eastern.
+      5) Verify that the UNIX_TIMESTAMP and FROM_UNIXTIME boundary conditions
+         behave as they should.
+      6) Clean up.  Lots of clean up.
+
+CREDITS
+    Thanks to Peter Kioko <ceph@techie.com> for helping to refine the idea.
+    Thanks to Adam Foxson <afoxson@pobox.com> for quality assurance and for
+    being the Human CPAN Reference Manual.
+
+AUTHOR
+    Bob O'Neill, <bobo@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2003 Bob O'Neill All rights reserved.
+
+    See COPYING for license
+
+SEE ALSO
+      L<perl>.
+      L<Time::Local>.
+
